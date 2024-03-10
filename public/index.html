@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+  
+    <h1>Stream</h1>
+    
+    <h3>Video Devices</h3>
+    <select id="videoDropDown">
+      
+    </select>
+
+    <h3>Audio Devices</h3>
+
+    <select id="audioDropDown">
+      
+    </select>
+    
+
+    <h3>Actions</h3>
+    <button id="startBtn">Start Recording</button>
+    <button id="stopBtn">Stop Recording</button>
+  
+
+    
+    <script>
+        const socket = io();
+
+        socket.emit('getDevices');
+        socket.on('deviceList',  (data) => {
+          const videoDropDown = document.getElementById('videoDropDown');
+          
+          data.videoDevice.forEach(function(video) {
+            const option = document.createElement('option');
+            option.value = video.id;
+            option.textContent = video.title;
+            videoDropDown.appendChild(option);
+          });
+
+          const audiDropDown = document.getElementById('audioDropDown');
+          
+          data.audioDevice.forEach(function(audio) {
+            const option = document.createElement('option');
+            option.value = audio.id;
+            option.textContent = audio.title;
+            audiDropDown.appendChild(option);
+          });
+        })
+
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        
+
+        startBtn.addEventListener('click', () => {
+          const video = document.getElementById('videoDropDown').selectedOptions[0].value;
+          const audio = document.getElementById('audioDropDown').selectedOptions[0].value;
+          alert('Stream Started')
+          socket.emit('startRecording', {video, audio});
+        });
+
+        stopBtn.addEventListener('click', () => {
+          alert('Stream Stop')
+          socket.emit('stopRecording');
+        });
+    
+    </script>
+</body>
+</html>
